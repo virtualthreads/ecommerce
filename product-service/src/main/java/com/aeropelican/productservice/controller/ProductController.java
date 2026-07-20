@@ -44,5 +44,18 @@ public class ProductController {
         Product product = productService.createProduct(createProductRequest);
         return ResponseEntity.ok(product);
     }
-    //delete api
+    //Update a product record
+    @PutMapping("/{productId}")
+    public ResponseEntity<Product> updateProduct(@PathVariable Integer productId,@RequestBody UpdateProduct updateProduct) {
+        System.out.println("Requesting to update a record..");
+        updateProduct.setProductId(productId);
+        Product product = productService.updateProduct(updateProduct);
+        return ResponseEntity.ok(product);
+    }
+    //To Delete a product record
+    @DeleteMapping("/{productId}")
+    public void deleteProduct(@PathVariable Integer productId) {
+        System.out.println("Requesting to delete a product...");
+        productService.deleteProduct(productId);
+    }
 }

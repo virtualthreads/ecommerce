@@ -52,4 +52,26 @@ public class ProductService {
         System.out.println("Created a product with product ID: " + createdProduct.getProductId());
         return createdProduct;
     }
+    //To update a product
+    public Product updateProduct(UpdateProduct updateProduct) {
+        System.out.println("Updating a record in Product table..");
+        Product product = productRepository.findById(updateProduct.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        product.setProductName(updateProduct.getProductName());
+        product.setCategory(updateProduct.getCategory());
+        product.setPrice(updateProduct.getPrice());
+        product.setQuantity(updateProduct.getQuantity());
+        Product updatedRecord = productRepository.save(product);
+        System.out.println("Updated Product with product ID: "+updatedRecord.getProductId());
+        return  updatedRecord;
+    }
+     //To delete product
+    public void deleteProduct(Integer productId) {
+        System.out.println("Deleting a record in Product table...");
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        productRepository.delete(product);
+        System.out.println("Deleted Product with product ID: "+productId);
+
+    }
 }
