@@ -52,4 +52,25 @@ public class ProductService {
         System.out.println("Created a product with product ID: " + createdProduct.getProductId());
         return createdProduct;
     }
+    // UPDATE PRODUCT
+    public Product updateProduct(Integer productId, UpdateProductRequest request) {
+
+        Product product = productRepository.findById(productId).get();
+
+        product.setProductName(request.getProductName());
+        product.setCategory(request.getCategory());
+        product.setPrice(request.getPrice());
+        product.setQuantity(request.getQuantity());
+
+        return productRepository.save(product);
+    }
+
+    // DELETE PRODUCT
+    public String deleteProduct(Integer productId) {
+
+        productRepository.deleteById(productId);
+
+        return "Product deleted successfully";
+    }
+
 }
