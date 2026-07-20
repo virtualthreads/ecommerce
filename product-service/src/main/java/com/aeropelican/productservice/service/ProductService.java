@@ -52,4 +52,29 @@ public class ProductService {
         System.out.println("Created a product with product ID: " + createdProduct.getProductId());
         return createdProduct;
     }
+
+    // UPDATE PRODUCT
+    public Product updateProduct(Integer id, Product updatedProduct) {
+
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        existingProduct.setProductName(updatedProduct.getProductName());
+        existingProduct.setCategory(updatedProduct.getCategory());
+        existingProduct.setPrice(updatedProduct.getPrice());
+        existingProduct.setQuantity(updatedProduct.getQuantity());
+
+        return productRepository.save(existingProduct);
+    }
+
+    // DELETE PRODUCT
+    public String deleteProduct(Integer id) {
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        productRepository.delete(product);
+
+        return "Product deleted successfully";
+    }
 }

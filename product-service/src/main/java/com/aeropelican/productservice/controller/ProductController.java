@@ -44,4 +44,24 @@ public class ProductController {
         Product product = productService.createProduct(createProductRequest);
         return ResponseEntity.ok(product);
     }
+
+    // UPDATE PRODUCT
+    @PutMapping("/{id}")
+    public ResponseEntity<Product> updateProduct(
+            @PathVariable Integer id,
+            @RequestBody Product product) {
+
+        Product updatedProduct = productService.updateProduct(id, product);
+
+        return ResponseEntity.ok(updatedProduct);
+    }
+
+    // DELETE PRODUCT
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteProduct(@PathVariable Integer id) {
+
+        String response = productService.deleteProduct(id);
+
+        return ResponseEntity.ok(response);
+    }
 }
