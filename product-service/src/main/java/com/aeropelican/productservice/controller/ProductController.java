@@ -44,4 +44,5 @@ public class ProductController {
         Product product = productService.createProduct(createProductRequest);
         return ResponseEntity.ok(product);
     }
+    //delete api
 }
