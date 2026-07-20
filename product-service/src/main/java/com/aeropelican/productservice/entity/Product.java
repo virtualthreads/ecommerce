@@ -1,22 +1,25 @@
 package com.aeropelican.productservice.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+        import lombok.Data;
 
-@Table(name = "products")
 @Entity
+@Table(name = "products")
 @Data
 public class Product {
+
     @Id
-    @Column(name = "product_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer productId;
-    @Column(name = "product_name")
-    private String productName;
-    @Column(name = "category")
-    private String category;
-    @Column(name = "price")
+
+    @Column(nullable = false)
+    private String name;
+
+    private String description;
+
+    @Column(nullable = false)
     private Double price;
-    @Column(name = "quantity")
+
+    @Column(nullable = false)
     private Integer quantity;
 }

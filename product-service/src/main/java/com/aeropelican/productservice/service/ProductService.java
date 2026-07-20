@@ -4,13 +4,9 @@ import com.aeropelican.productservice.dto.CreateProductRequest;
 import com.aeropelican.productservice.entity.Product;
 import com.aeropelican.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
-import javax.management.RuntimeMBeanException;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,38 +14,45 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
-    public List<Product> listProducts() {
-        List<Product> results = productRepository.findAll();
-        return results;
-    }
-
-    public Product getProduct(Integer productId) {
-        Optional<Product> product = productRepository.findById(productId);
-        if (product.isPresent()) {
-            return product.get();
-        } else {
-            return null;
-        }
-    }
-
-    public Product updateProduct(Integer productId, Integer quantity) {
-        Product product = productRepository.findById(productId).get();
-        product.setQuantity(quantity);
-        productRepository.save(product);
-        return product;
-    }
-
+    // Create Product
     public Product createProduct(CreateProductRequest request) {
-        System.out.println("Attempting to create a record in the product table");
 
         Product product = new Product();
-        product.setProductName(request.getProductName());
-        product.setCategory(request.getCategory());
+
+        product.setName(request.getName());
+        product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
         product.setQuantity(request.getQuantity());
 
-        Product createdProduct = productRepository.save(product);
-        System.out.println("Created a product with product ID: " + createdProduct.getProductId());
-        return createdProduct;
+        return productRepository.save(product);
+    }
+
+    // Get All Products
+    public List<Product> listProducts() {
+        return productRepository.findAll();
+    }
+
+    // Get Product By Id
+    public Product getProduct(Integer productId) {
+        return productRepository.findById(productId).orElse(null);
+    }
+
+    // Update Product Quantity
+    public Product updateProduct(Integer productId, Integer quantity) {
+
+        Product product = productRepository.findById(productId).orElse(null);
+
+        if (product == null) {
+            return null;
+        }
+
+        product.setQuantity(quantity);
+
+        return productRepository.save(product);
+    }
+
+    // Delete Product
+    public void deleteProduct(Integer productId) {
+        productRepository.deleteById(productId);
     }
 }
