@@ -38,6 +38,20 @@ public class ProductController {
         return productService.updateProduct(id, qty);
     }
 
+    // PUT: Update an existing product
+    @PutMapping("/{id}")
+    public ResponseEntity<Product> updateProduct(@PathVariable Integer id, @RequestBody Product product) {
+        Product updated = productService.updateProduct(id, product);
+        return ResponseEntity.ok(updated);
+    }
+
+    // DELETE: Delete a product by ID
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteProduct(@PathVariable Integer id) {
+        String response = productService.deleteProduct(id);
+        return ResponseEntity.ok(response);
+    }
+    
     @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody CreateProductRequest createProductRequest) {
         System.out.println("Received a post request from client");
