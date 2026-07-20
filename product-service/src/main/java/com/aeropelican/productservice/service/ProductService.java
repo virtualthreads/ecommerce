@@ -32,11 +32,33 @@ public class ProductService {
         }
     }
 
+    // Original quantity update method
     public Product updateProduct(Integer productId, Integer quantity) {
         Product product = productRepository.findById(productId).get();
         product.setQuantity(quantity);
         productRepository.save(product);
         return product;
+    }
+
+    // UPDATE product by ID (PUT)
+    public Product updateProduct(Integer id, Product updatedProduct) {
+        return productRepository.findById(id).map(existingProduct -> {
+            existingProduct.setProductName(updatedProduct.getProductName());
+            existingProduct.setCategory(updatedProduct.getCategory());
+            existingProduct.setPrice(updatedProduct.getPrice());
+            existingProduct.setQuantity(updatedProduct.getQuantity());
+            return productRepository.save(existingProduct);
+        }).orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+    }
+
+    // DELETE product by ID (DELETE)
+    public String deleteProduct(Integer id) {
+        if (productRepository.existsById(id)) {
+            productRepository.deleteById(id);
+            return "Product deleted successfully with id: " + id;
+        } else {
+            throw new RuntimeException("Product not found with id: " + id);
+        }
     }
 
     public Product createProduct(CreateProductRequest request) {
