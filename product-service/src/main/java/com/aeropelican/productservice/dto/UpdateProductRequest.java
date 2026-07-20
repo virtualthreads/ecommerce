@@ -9,5 +9,6 @@ public class UpdateProductRequest {
     private String category;
     private Double price;
     private Integer quantity;
+    // Done by guru
 
 }

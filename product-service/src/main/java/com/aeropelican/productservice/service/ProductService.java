@@ -71,6 +71,7 @@ public class ProductService {
         productRepository.deleteById(productId);
 
         return "Product deleted successfully";
+        // Done by guru
     }
 
 }
