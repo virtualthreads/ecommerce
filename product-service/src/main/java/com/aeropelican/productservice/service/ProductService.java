@@ -31,25 +31,4 @@ public class ProductService {
             return null;
         }
     }
-
-    public Product updateProduct(Integer productId, Integer quantity) {
-        Product product = productRepository.findById(productId).get();
-        product.setQuantity(quantity);
-        productRepository.save(product);
-        return product;
-    }
-
-    public Product createProduct(CreateProductRequest request) {
-        System.out.println("Attempting to create a record in the product table");
-
-        Product product = new Product();
-        product.setProductName(request.getProductName());
-        product.setCategory(request.getCategory());
-        product.setPrice(request.getPrice());
-        product.setQuantity(request.getQuantity());
-
-        Product createdProduct = productRepository.save(product);
-        System.out.println("Created a product with product ID: " + createdProduct.getProductId());
-        return createdProduct;
-    }
 }

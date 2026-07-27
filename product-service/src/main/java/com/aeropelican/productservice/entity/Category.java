@@ -5,20 +5,21 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Table(name = "products")
 @Entity
+@Table(name = "categories")
 @Data
-public class Product {
+public class Category {
     @Id
-    @Column(name = "product_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer productId;
-    @Column(name = "product_name")
-    private String productName;
+    @Column(name = "category_id")
+    private Long categoryId;
+    @Column(name = "category_name")
+    private String categoryName;
     @Column(name = "description")
     private String description;
-    @Column(name = "brand")
-    private String brand;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_category_id")
+    private Category parentCategory;
     @Column(name = "is_active")
     private Boolean isActive = true;
     @Column(name = "created_at")

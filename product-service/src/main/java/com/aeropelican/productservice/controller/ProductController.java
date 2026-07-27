@@ -1,6 +1,7 @@
 package com.aeropelican.productservice.controller;
 
 import com.aeropelican.productservice.dto.CreateProductRequest;
+import com.aeropelican.productservice.dto.response.ApiResponse;
 import com.aeropelican.productservice.entity.Product;
 import com.aeropelican.productservice.repository.ProductRepository;
 import com.aeropelican.productservice.service.ProductService;
@@ -10,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -26,22 +29,16 @@ public class ProductController {
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<Product> getProduct(@PathVariable(name = "productId") Integer pid) {
+    public ResponseEntity<ApiResponse<Product>> getProduct(@PathVariable(name = "productId") Integer pid) {
         Product product = productService.getProduct(pid);
-        if (product == null)
-            return ResponseEntity.noContent().build();
-        return ResponseEntity.ok(product);
-    }
 
-    @PutMapping("/{productId}/{quantity}")
-    public Product updateProduct(@PathVariable("productId") Integer id, @PathVariable("quantity") Integer qty) {
-        return productService.updateProduct(id, qty);
-    }
+        ApiResponse apiResponse = ApiResponse.builder()
+                .data(product)
+                .message("Product details fetched successfully")
+                .success(product == null ? false : true)
+                .timestamp(LocalDateTime.now())
+                .build();
 
-    @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody CreateProductRequest createProductRequest) {
-        System.out.println("Received a post request from client");
-        Product product = productService.createProduct(createProductRequest);
-        return ResponseEntity.ok(product);
+        return ResponseEntity.ok(apiResponse);
     }
 }
