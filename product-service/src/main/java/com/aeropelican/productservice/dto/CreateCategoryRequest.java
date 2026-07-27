@@ -1,17 +1,12 @@
 package com.aeropelican.productservice.dto;
-
-import jakarta.persistence.Column;
 import lombok.Data;
-
 import java.sql.Timestamp;
-
 @Data
-public class CreateProductRequest {
-    private Integer productId;
-    private String productName;
-    private Integer category_id;
+public class CreateCategoryRequest {
+    private  Integer category_id;
+    private String category_name;
     private String description;
-    private String brand;
+    private Integer parent_category_id;
     private boolean is_active =true;
     private Timestamp created_at;
     private Timestamp updated_at;

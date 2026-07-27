@@ -1,77 +1,60 @@
 package com.aeropelican.productservice.service;
 
 import com.aeropelican.productservice.dto.CreateProductRequest;
+import com.aeropelican.productservice.dto.UpdateProduct;
 import com.aeropelican.productservice.entity.Product;
 import com.aeropelican.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
-import javax.management.RuntimeMBeanException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ProductService {
-
-    private final ProductRepository productRepository;
-
-    public List<Product> listProducts() {
+        private final ProductRepository productRepository;
+        public Product getProduct(Integer productId) {
+            return productRepository.findById(productId)
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+        }
+        public List<Product> listProducts() {
         List<Product> results = productRepository.findAll();
         return results;
-    }
+        }
+        public Product createProduct(CreateProductRequest request) {
+            Product product = new Product();
+            product.setProductName(request.getProductName());
+            product.setCategory_id(request.getCategory_id());
+            product.setDescription(request.getDescription());
+            product.setBrand(request.getBrand());
+            Timestamp now = new Timestamp(System.currentTimeMillis());
+            product.setCreated_at(now);
+            product.setUpdated_at(now);
 
-    public Product getProduct(Integer productId) {
-        Optional<Product> product = productRepository.findById(productId);
-        if (product.isPresent()) {
-            return product.get();
-        } else {
-            return null;
+            return productRepository.save(product);
+        }
+
+        public Product updateProduct(Integer productId, UpdateProduct request) {
+
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+
+            product.setProductName(request.getProductName());
+            product.setCategory_id(request.getCategory_id());
+            product.setDescription(request.getDescription());
+            product.setBrand(request.getBrand());
+
+            return productRepository.save(product);
+        }
+
+        public Product deleteProduct(Integer productId) {
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+            productRepository.delete(product);
+
+            return product;
         }
     }
 
-    public Product updateProduct(Integer productId, Integer quantity) {
-        Product product = productRepository.findById(productId).get();
-        product.setQuantity(quantity);
-        productRepository.save(product);
-        return product;
-    }
-
-    public Product createProduct(CreateProductRequest request) {
-        System.out.println("Attempting to create a record in the product table");
-
-        Product product = new Product();
-        product.setProductName(request.getProductName());
-        product.setCategory(request.getCategory());
-        product.setPrice(request.getPrice());
-        product.setQuantity(request.getQuantity());
-
-        Product createdProduct = productRepository.save(product);
-        System.out.println("Created a product with product ID: " + createdProduct.getProductId());
-        return createdProduct;
-    }
-    //To update a product
-    public Product updateProduct(UpdateProduct updateProduct) {
-        System.out.println("Updating a record in Product table..");
-        Product product = productRepository.findById(updateProduct.getProductId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-        product.setProductName(updateProduct.getProductName());
-        product.setCategory(updateProduct.getCategory());
-        product.setPrice(updateProduct.getPrice());
-        product.setQuantity(updateProduct.getQuantity());
-        Product updatedRecord = productRepository.save(product);
-        System.out.println("Updated Product with product ID: "+updatedRecord.getProductId());
-        return  updatedRecord;
-    }
-     //To delete product
-    public void deleteProduct(Integer productId) {
-        System.out.println("Deleting a record in Product table...");
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-        productRepository.delete(product);
-        System.out.println("Deleted Product with product ID: "+productId);
-
-    }
-}

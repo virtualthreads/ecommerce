@@ -2,27 +2,27 @@ package com.aeropelican.productservice.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.sql.Timestamp;
-@Table(name = "products")
 @Entity
+@Table(name = "categories")
 @Data
-public class Product {
+public class Category {
     @Id
-    @Column(name = "product_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer productId;
-    @Column(name = "product_name")
-    private String productName;
     @Column(name = "category_id")
     private Integer category_id;
+    @Column(name = "category_name")
+    private String category_name;
     @Column(name = "description")
     private String description;
-    @Column(name = "brand")
-    private String brand;
+    @Column(name = "parent_category_id")
+    private Integer parent_category_id;
     @Column(name = "is_active")
-    private Boolean is_active = true;
+    private boolean is_active = true;
     @Column(name = "created_at")
     private Timestamp created_at;
     @Column(name = "updated_at")
     private Timestamp updated_at;
-
 }
+
+
+
