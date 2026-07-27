@@ -1,14 +1,13 @@
 package com.aeropelican.productservice.service;
 
-import com.aeropelican.productservice.dto.CreateProductRequest;
+import com.aeropelican.productservice.dto.ClearProductRequest;
 import com.aeropelican.productservice.entity.Product;
 import com.aeropelican.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.server.ResponseStatusException;
 
-import javax.management.RuntimeMBeanException;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,29 +16,25 @@ import java.util.Optional;
 public class ProductService {
 
     private final ProductRepository productRepository;
-
     public List<Product> listProducts() {
-        List<Product> results = productRepository.findAll();
-        return results;
+        return productRepository.findAll();
     }
 
     public Product getProduct(Integer productId) {
         Optional<Product> product = productRepository.findById(productId);
-        if (product.isPresent()) {
-            return product.get();
-        } else {
-            return null;
-        }
+        return product.orElse(null);
     }
 
     public Product updateProduct(Integer productId, Integer quantity) {
-        Product product = productRepository.findById(productId).get();
+        // Prevents NoSuchElementException if the ID doesn't exist
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+
         product.setQuantity(quantity);
-        productRepository.save(product);
-        return product;
+        return productRepository.save(product);
     }
 
-    public Product createProduct(CreateProductRequest request) {
+    public Product createProduct(ClearProductRequest request) {
         System.out.println("Attempting to create a record in the product table");
 
         Product product = new Product();
@@ -51,5 +46,13 @@ public class ProductService {
         Product createdProduct = productRepository.save(product);
         System.out.println("Created a product with product ID: " + createdProduct.getProductId());
         return createdProduct;
+    }
+
+    public boolean deleteProduct(Integer productId) {
+        if (productRepository.existsById(productId)) {
+            productRepository.deleteById(productId);
+            return true;
+        }
+        return false;
     }
 }
