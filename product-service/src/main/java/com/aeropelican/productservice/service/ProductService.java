@@ -1,77 +1,70 @@
 package com.aeropelican.productservice.service;
 
-import com.aeropelican.productservice.dto.CreateProductRequest;
+import com.aeropelican.productservice.dto.response.CreateProductRequest;
+import com.aeropelican.productservice.dto.response.UpdateProduct;
+import com.aeropelican.productservice.entity.Category;
 import com.aeropelican.productservice.entity.Product;
+import com.aeropelican.productservice.repository.CategoryRepository;
 import com.aeropelican.productservice.repository.ProductRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
-import javax.management.RuntimeMBeanException;
 import java.util.List;
-import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class ProductService {
 
-    private final ProductRepository productRepository;
+    @Autowired
+    private ProductRepository productRepository;
 
-    public List<Product> listProducts() {
-        List<Product> results = productRepository.findAll();
-        return results;
-    }
+    @Autowired
+    private CategoryRepository categoryRepository;
 
-    public Product getProduct(Integer productId) {
-        Optional<Product> product = productRepository.findById(productId);
-        if (product.isPresent()) {
-            return product.get();
-        } else {
-            return null;
-        }
-    }
-
-    // Original quantity update method
-    public Product updateProduct(Integer productId, Integer quantity) {
-        Product product = productRepository.findById(productId).get();
-        product.setQuantity(quantity);
-        productRepository.save(product);
-        return product;
-    }
-
-    // UPDATE product by ID (PUT)
-    public Product updateProduct(Integer id, Product updatedProduct) {
-        return productRepository.findById(id).map(existingProduct -> {
-            existingProduct.setProductName(updatedProduct.getProductName());
-            existingProduct.setCategory(updatedProduct.getCategory());
-            existingProduct.setPrice(updatedProduct.getPrice());
-            existingProduct.setQuantity(updatedProduct.getQuantity());
-            return productRepository.save(existingProduct);
-        }).orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
-    }
-
-    // DELETE product by ID (DELETE)
-    public String deleteProduct(Integer id) {
-        if (productRepository.existsById(id)) {
-            productRepository.deleteById(id);
-            return "Product deleted successfully with id: " + id;
-        } else {
-            throw new RuntimeException("Product not found with id: " + id);
-        }
-    }
-
-    public Product createProduct(CreateProductRequest request) {
-        System.out.println("Attempting to create a record in the product table");
+    public Product saveProduct(CreateProductRequest request) {
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category Not Found"));
 
         Product product = new Product();
         product.setProductName(request.getProductName());
-        product.setCategory(request.getCategory());
+        product.setDescription(request.getDescription());
+        product.setBrand(request.getBrand());
         product.setPrice(request.getPrice());
         product.setQuantity(request.getQuantity());
+        product.setCategory(category);
 
-        Product createdProduct = productRepository.save(product);
-        System.out.println("Created a product with product ID: " + createdProduct.getProductId());
-        return createdProduct;
+        return productRepository.save(product);
+    }
+
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
+    }
+
+    public Product getProductById(Integer id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product Not Found"));
+    }
+
+    public Product updateProduct(Integer id, UpdateProduct request) {
+        Product product = getProductById(id);
+
+        if (request.getCategoryId() != null) {
+            Category category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Category Not Found"));
+            product.setCategory(category);
+        }
+
+        if (request.getProductName() != null) product.setProductName(request.getProductName());
+        if (request.getDescription() != null) product.setDescription(request.getDescription());
+        if (request.getBrand() != null) product.setBrand(request.getBrand());
+        if (request.getPrice() != null) product.setPrice(request.getPrice());
+        if (request.getQuantity() != null) product.setQuantity(request.getQuantity());
+
+        return productRepository.save(product);
+    }
+
+    public String deleteProduct(Integer id) {
+        Product product = getProductById(id);
+        productRepository.delete(product);
+        return "Product deleted successfully";
     }
 }
