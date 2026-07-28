@@ -1,8 +1,8 @@
-package com.aeropelican.productservice.dto;
+package com.aeropelican.productservice.dto.request;
 import lombok.Data;
 import java.sql.Timestamp;
 @Data
-public class CreateProduct_VariantsRequest {
+public class UpdateProduct_Variants {
     private Integer variant_id;
     private Integer product_id;
     private String sku;

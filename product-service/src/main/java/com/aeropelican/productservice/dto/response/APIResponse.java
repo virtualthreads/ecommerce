@@ -12,4 +12,5 @@ public class APIResponse<T>{
     private String message;
     private Boolean success;
     private LocalDateTime timestamp;
+    private ApiError error;
 }

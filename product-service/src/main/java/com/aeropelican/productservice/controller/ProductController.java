@@ -1,8 +1,9 @@
 package com.aeropelican.productservice.controller;
 
-import com.aeropelican.productservice.dto.CreateProductRequest;
-import com.aeropelican.productservice.dto.UpdateProduct;
+import com.aeropelican.productservice.dto.request.CreateProductRequest;
+import com.aeropelican.productservice.dto.request.UpdateProduct;
 import com.aeropelican.productservice.dto.response.APIResponse;
+import com.aeropelican.productservice.dto.response.ProductResponse;
 import com.aeropelican.productservice.entity.Product;
 import com.aeropelican.productservice.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -19,23 +20,22 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
-    @GetMapping
+    /*@GetMapping
     public List<Product> getAllProducts() {
         List<Product> result = productService.listProducts();
         return result;
-    }
-    @GetMapping("/{productId}")
-    public ResponseEntity<APIResponse<Product>> getProduct(
-            @PathVariable Integer productId) {
-        Product product = productService.getProduct(productId);
-        APIResponse<Product> response = APIResponse.<Product>builder()
-                .data(product)
-                .message("Product fetched successfully")
-                .success(product != null)
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        return ResponseEntity.ok(response);
+    }*/
+    @GetMapping
+    public ResponseEntity<APIResponse<List<ProductResponse>>> getAllProduct( ){
+        List<ProductResponse> result = productService.listProducts();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(APIResponse.<List<ProductResponse>>builder()
+                        .data(result)
+                        .message("Product fetched successfully")
+                        .success(true)
+                        .timestamp(LocalDateTime.now())
+                        .build());
     }
 
     @PostMapping

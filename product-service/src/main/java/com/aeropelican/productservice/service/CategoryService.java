@@ -1,12 +1,16 @@
 package com.aeropelican.productservice.service;
 
-import com.aeropelican.productservice.dto.CreateCategoryRequest;
-import com.aeropelican.productservice.dto.UpdateCategory;
+import com.aeropelican.productservice.dto.request.CreateCategoryRequest;
+import com.aeropelican.productservice.dto.request.UpdateCategory;
+import com.aeropelican.productservice.dto.response.CategoryResponse;
+import com.aeropelican.productservice.dto.response.ProductResponse;
 import com.aeropelican.productservice.entity.Category;
+import com.aeropelican.productservice.entity.Product;
 import com.aeropelican.productservice.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +20,7 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    public List<Category> listCategory() {
+   /* public List<Category> listCategory() {
         List<Category> results = categoryRepository.findAll();
         return results;
     }
@@ -28,6 +32,32 @@ public class CategoryService {
         } else {
             return null;
         }
+    }*/
+    public Category getCategory(Integer category_id) {
+        return categoryRepository.findById(category_id)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+    }
+    public List<CategoryResponse> listCategories() {
+
+        List<Category> results = categoryRepository.findAll();
+        List<CategoryResponse> response = new ArrayList<>();
+
+        for (Category category : results) {
+
+            CategoryResponse categoryResponse = CategoryResponse.builder()
+                    .category_id(category.getCategory_id())
+                    .category_name(category.getCategory_name())
+                    .description(category.getDescription())
+                    .parent_category_id(category.getParent_category_id())
+                    .is_active(category.is_active())
+                    .created_at(category.getCreated_at())
+                    .updated_at(category.getUpdated_at())
+                    .build();
+
+            response.add(categoryResponse);
+        }
+
+        return response;
     }
     public Category createCategory(CreateCategoryRequest request) {
         System.out.println("Attempting to create a record in the Category table");

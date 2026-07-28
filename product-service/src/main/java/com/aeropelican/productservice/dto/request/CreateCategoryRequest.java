@@ -1,4 +1,4 @@
-package com.aeropelican.productservice.dto;
+package com.aeropelican.productservice.dto.request;
 import lombok.Data;
 import java.sql.Timestamp;
 @Data

@@ -1,10 +1,11 @@
-package com.aeropelican.productservice.dto;
+package com.aeropelican.productservice.dto.request;
+
 import lombok.Data;
 
 import java.sql.Timestamp;
 
 @Data
-public class UpdateProduct {
+public class CreateProductRequest {
     private Integer productId;
     private String productName;
     private Integer category_id;
@@ -13,5 +14,4 @@ public class UpdateProduct {
     private boolean is_active =true;
     private Timestamp created_at;
     private Timestamp updated_at;
-
 }
