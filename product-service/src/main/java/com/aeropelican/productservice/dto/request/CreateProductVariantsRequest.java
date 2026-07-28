@@ -1,4 +1,4 @@
-package com.aeropelican.productservice.dto.response;
+package com.aeropelican.productservice.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateProductVariantsRequest {
-    private Integer productId;
+    private Long productId;
     private String variantName;
     private String color;
     private String size;

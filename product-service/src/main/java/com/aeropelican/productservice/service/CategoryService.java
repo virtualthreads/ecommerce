@@ -1,7 +1,7 @@
 package com.aeropelican.productservice.service;
 
-import com.aeropelican.productservice.dto.response.CreateCategoryRequest;
-import com.aeropelican.productservice.dto.response.UpdateCategory;
+import com.aeropelican.productservice.dto.request.CreateCategoryRequest;
+import com.aeropelican.productservice.dto.request.UpdateCategoryRequest;
 import com.aeropelican.productservice.entity.Category;
 import com.aeropelican.productservice.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +31,10 @@ public class CategoryService {
     public Category getCategoryById(Integer id) {
 
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category Not Found"));
+                .orElseThrow(() -> new RuntimeException("Category with ID " + id + " not found"));
     }
 
-    public Category updateCategory(Integer id, UpdateCategory request) {
+    public Category updateCategory(Integer id, UpdateCategoryRequest request) {
 
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category Not Found"));

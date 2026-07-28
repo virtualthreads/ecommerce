@@ -1,4 +1,4 @@
-package com.aeropelican.productservice.dto.response;
+package com.aeropelican.productservice.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

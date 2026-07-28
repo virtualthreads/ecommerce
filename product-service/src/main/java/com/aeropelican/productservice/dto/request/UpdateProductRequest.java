@@ -1,4 +1,4 @@
-package com.aeropelican.productservice.dto.response;
+package com.aeropelican.productservice.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateProductRequest {
+public class UpdateProductRequest {
     private String productName;
     private String description;
     private String brand;
