@@ -2,13 +2,19 @@ package com.aeropelican.productservice.service;
 
 import com.aeropelican.productservice.dto.request.CreateProductRequest;
 import com.aeropelican.productservice.dto.request.UpdateProductRequest;
+import com.aeropelican.productservice.dto.response.ProductResponse;
 import com.aeropelican.productservice.entity.Category;
 import com.aeropelican.productservice.entity.Product;
+import com.aeropelican.productservice.exception.BadRequestException;
+import com.aeropelican.productservice.exception.DuplicateResourceException;
+import com.aeropelican.productservice.exception.ResourceNotFoundException;
+import com.aeropelican.productservice.mapper.ProductMapper;
 import com.aeropelican.productservice.repository.CategoryRepository;
 import com.aeropelican.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -18,74 +24,131 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
 
-    // Get All Products
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    // ============================
+    // GET ALL PRODUCTS
+    // ============================
+
+    public List<ProductResponse> getAllProducts() {
+
+        return productRepository.findAll()
+                .stream()
+                .map(ProductMapper::toResponse)
+                .toList();
     }
 
-    // Get Product By Id
-    public Product getProduct(Long productId) {
-        return productRepository.findById(productId).orElse(null);
+    // ============================
+    // GET PRODUCT BY ID
+    // ============================
+
+    public ProductResponse getProduct(Long productId) {
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Product not found with id : " + productId));
+
+        return ProductMapper.toResponse(product);
     }
 
-    // Create Product
-    public Product createProduct(CreateProductRequest request) {
+    // ============================
+    // CREATE PRODUCT
+    // ============================
 
-        Category category = categoryRepository
-                .findById(request.getCategoryId())
-                .orElse(null);
+    public ProductResponse createProduct(CreateProductRequest request) {
 
-        if (category == null) {
-            return null;
+        if (request.getProductName() == null ||
+                request.getProductName().trim().isEmpty()) {
+
+            throw new BadRequestException("Product name is required.");
+        }
+
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Category not found with id : " + request.getCategoryId()));
+
+        boolean exists = productRepository.findAll()
+                .stream()
+                .anyMatch(product ->
+                        product.getProductName().equalsIgnoreCase(
+                                request.getProductName().trim())
+                                &&
+                                product.getCategory().getCategoryId()
+                                        .equals(category.getCategoryId()));
+
+        if (exists) {
+            throw new DuplicateResourceException(
+                    "Product already exists in this category.");
         }
 
         Product product = new Product();
 
         product.setCategory(category);
-        product.setProductName(request.getProductName());
+        product.setProductName(request.getProductName().trim());
         product.setDescription(request.getDescription());
-        product.setBrand(request.getBrand());
-        product.setIsActive(request.getIsActive());
+        product.setBrand(request.getBrand().trim());
 
-        return productRepository.save(product);
+        product.setIsActive(
+                request.getIsActive() == null
+                        ? true
+                        : request.getIsActive());
+
+        product.setCreatedAt(LocalDateTime.now());
+        product.setUpdatedAt(LocalDateTime.now());
+
+        product = productRepository.save(product);
+
+        return ProductMapper.toResponse(product);
     }
 
-    // Update Product
-    public Product updateProduct(Long productId, UpdateProductRequest request) {
+    // ============================
+    // UPDATE PRODUCT
+    // ============================
 
-        Product product = productRepository
-                .findById(productId)
-                .orElse(null);
+    public ProductResponse updateProduct(
+            Long productId,
+            UpdateProductRequest request) {
 
-        if (product == null) {
-            return null;
-        }
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Product not found with id : " + productId));
 
-        Category category = categoryRepository
-                .findById(request.getCategoryId())
-                .orElse(null);
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Category not found with id : " + request.getCategoryId()));
 
-        if (category == null) {
-            return null;
+        if (request.getProductName() == null ||
+                request.getProductName().trim().isEmpty()) {
+
+            throw new BadRequestException("Product name is required.");
         }
 
         product.setCategory(category);
-        product.setProductName(request.getProductName());
+        product.setProductName(request.getProductName().trim());
         product.setDescription(request.getDescription());
-        product.setBrand(request.getBrand());
+        product.setBrand(request.getBrand().trim());
         product.setIsActive(request.getIsActive());
+        product.setUpdatedAt(LocalDateTime.now());
 
-        return productRepository.save(product);
+        product = productRepository.save(product);
+
+        return ProductMapper.toResponse(product);
     }
 
-    // Delete Product
+    // ============================
+    // DELETE PRODUCT
+    // ============================
+
     public boolean deleteProduct(Long productId) {
 
-        if (!productRepository.existsById(productId)) {
-            return false;
-        }
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Product not found with id : " + productId));
 
-        productRepository.deleteById(productId);
+        productRepository.delete(product);
 
         return true;
     }

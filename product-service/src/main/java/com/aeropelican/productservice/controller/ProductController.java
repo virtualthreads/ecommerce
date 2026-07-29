@@ -3,8 +3,9 @@ package com.aeropelican.productservice.controller;
 import com.aeropelican.productservice.dto.request.CreateProductRequest;
 import com.aeropelican.productservice.dto.request.UpdateProductRequest;
 import com.aeropelican.productservice.dto.response.ApiResponse;
-import com.aeropelican.productservice.entity.Product;
+import com.aeropelican.productservice.dto.response.ProductResponse;
 import com.aeropelican.productservice.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,115 +14,101 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/products")
+@RequestMapping("/api/products")
 @RequiredArgsConstructor
 public class ProductController {
 
     private final ProductService productService;
 
-    // ============================
+    // ==========================================
     // GET ALL PRODUCTS
-    // ============================
+    // ==========================================
+
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Product>>> getAllProducts() {
+    public ResponseEntity<ApiResponse<List<ProductResponse>>> getAllProducts() {
 
-        List<Product> products = productService.getAllProducts();
-
-        ApiResponse<List<Product>> response = ApiResponse.<List<Product>>builder()
-                .success(true)
-                .message("Products fetched successfully")
-                .data(products)
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                ApiResponse.<List<ProductResponse>>builder()
+                        .success(true)
+                        .message("Products fetched successfully.")
+                        .data(productService.getAllProducts())
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
     }
 
-    // ============================
+    // ==========================================
     // GET PRODUCT BY ID
-    // ============================
+    // ==========================================
+
     @GetMapping("/{productId}")
-    public ResponseEntity<ApiResponse<Product>> getProduct(
+    public ResponseEntity<ApiResponse<ProductResponse>> getProduct(
             @PathVariable Long productId) {
 
-        Product product = productService.getProduct(productId);
-
-        ApiResponse<Product> response = ApiResponse.<Product>builder()
-                .success(product != null)
-                .message(product != null
-                        ? "Product fetched successfully"
-                        : "Product not found")
-                .data(product)
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                ApiResponse.<ProductResponse>builder()
+                        .success(true)
+                        .message("Product fetched successfully.")
+                        .data(productService.getProduct(productId))
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
     }
 
-    // ============================
+    // ==========================================
     // CREATE PRODUCT
-    // ============================
+    // ==========================================
+
     @PostMapping
-    public ResponseEntity<ApiResponse<Product>> createProduct(
-            @RequestBody CreateProductRequest request) {
+    public ResponseEntity<ApiResponse<ProductResponse>> createProduct(
+            @Valid @RequestBody CreateProductRequest request) {
 
-        Product product = productService.createProduct(request);
-
-        ApiResponse<Product> response = ApiResponse.<Product>builder()
-                .success(product != null)
-                .message(product != null
-                        ? "Product created successfully"
-                        : "Category not found")
-                .data(product)
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                ApiResponse.<ProductResponse>builder()
+                        .success(true)
+                        .message("Product created successfully.")
+                        .data(productService.createProduct(request))
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
     }
 
-    // ============================
+    // ==========================================
     // UPDATE PRODUCT
-    // ============================
+    // ==========================================
+
     @PutMapping("/{productId}")
-    public ResponseEntity<ApiResponse<Product>> updateProduct(
+    public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(
             @PathVariable Long productId,
-            @RequestBody UpdateProductRequest request) {
+            @Valid @RequestBody UpdateProductRequest request) {
 
-        Product product = productService.updateProduct(productId, request);
-
-        ApiResponse<Product> response = ApiResponse.<Product>builder()
-                .success(product != null)
-                .message(product != null
-                        ? "Product updated successfully"
-                        : "Product or Category not found")
-                .data(product)
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                ApiResponse.<ProductResponse>builder()
+                        .success(true)
+                        .message("Product updated successfully.")
+                        .data(productService.updateProduct(productId, request))
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
     }
 
-    // ============================
+    // ==========================================
     // DELETE PRODUCT
-    // ============================
+    // ==========================================
+
     @DeleteMapping("/{productId}")
     public ResponseEntity<ApiResponse<String>> deleteProduct(
             @PathVariable Long productId) {
 
-        boolean deleted = productService.deleteProduct(productId);
+        productService.deleteProduct(productId);
 
-        ApiResponse<String> response = ApiResponse.<String>builder()
-                .success(deleted)
-                .message(deleted
-                        ? "Product deleted successfully"
-                        : "Product not found")
-                .data(deleted
-                        ? "Product deleted successfully"
-                        : "No Product Found")
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
+                        .success(true)
+                        .message("Product deleted successfully.")
+                        .data(null)
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
     }
-
 }

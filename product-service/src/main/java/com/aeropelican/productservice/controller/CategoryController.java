@@ -3,8 +3,9 @@ package com.aeropelican.productservice.controller;
 import com.aeropelican.productservice.dto.request.CreateCategoryRequest;
 import com.aeropelican.productservice.dto.request.UpdateCategoryRequest;
 import com.aeropelican.productservice.dto.response.ApiResponse;
-import com.aeropelican.productservice.entity.Category;
+import com.aeropelican.productservice.dto.response.CategoryResponse;
 import com.aeropelican.productservice.service.CategoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,104 +14,81 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/categories")
+@RequestMapping("/api/categories")
 @RequiredArgsConstructor
 public class CategoryController {
 
     private final CategoryService categoryService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Category>>> getAllCategories() {
+    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getAllCategories() {
 
-        List<Category> categories = categoryService.getAllCategories();
-
-        ApiResponse<List<Category>> response =
-                ApiResponse.<List<Category>>builder()
+        return ResponseEntity.ok(
+                ApiResponse.<List<CategoryResponse>>builder()
                         .success(true)
-                        .message("Categories fetched successfully")
-                        .data(categories)
+                        .message("Categories fetched successfully.")
+                        .data(categoryService.getAllCategories())
                         .timestamp(LocalDateTime.now())
-                        .build();
-
-        return ResponseEntity.ok(response);
+                        .build()
+        );
     }
 
     @GetMapping("/{categoryId}")
-    public ResponseEntity<ApiResponse<Category>> getCategory(
+    public ResponseEntity<ApiResponse<CategoryResponse>> getCategory(
             @PathVariable Long categoryId) {
 
-        Category category = categoryService.getCategory(categoryId);
-
-        ApiResponse<Category> response =
-                ApiResponse.<Category>builder()
-                        .success(category != null)
-                        .message(category != null ?
-                                "Category fetched successfully"
-                                : "Category not found")
-                        .data(category)
+        return ResponseEntity.ok(
+                ApiResponse.<CategoryResponse>builder()
+                        .success(true)
+                        .message("Category fetched successfully.")
+                        .data(categoryService.getCategory(categoryId))
                         .timestamp(LocalDateTime.now())
-                        .build();
-
-        return ResponseEntity.ok(response);
+                        .build()
+        );
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Category>> createCategory(
-            @RequestBody CreateCategoryRequest request) {
+    public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(
+            @Valid @RequestBody CreateCategoryRequest request) {
 
-        Category category = categoryService.createCategory(request);
-
-        ApiResponse<Category> response =
-                ApiResponse.<Category>builder()
+        return ResponseEntity.ok(
+                ApiResponse.<CategoryResponse>builder()
                         .success(true)
-                        .message("Category created successfully")
-                        .data(category)
+                        .message("Category created successfully.")
+                        .data(categoryService.createCategory(request))
                         .timestamp(LocalDateTime.now())
-                        .build();
-
-        return ResponseEntity.ok(response);
+                        .build()
+        );
     }
 
     @PutMapping("/{categoryId}")
-    public ResponseEntity<ApiResponse<Category>> updateCategory(
+    public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
             @PathVariable Long categoryId,
-            @RequestBody UpdateCategoryRequest request) {
+            @Valid @RequestBody UpdateCategoryRequest request) {
 
-        Category category =
-                categoryService.updateCategory(categoryId, request);
-
-        ApiResponse<Category> response =
-                ApiResponse.<Category>builder()
-                        .success(category != null)
-                        .message(category != null ?
-                                "Category updated successfully"
-                                : "Category not found")
-                        .data(category)
+        return ResponseEntity.ok(
+                ApiResponse.<CategoryResponse>builder()
+                        .success(true)
+                        .message("Category updated successfully.")
+                        .data(categoryService.updateCategory(categoryId, request))
                         .timestamp(LocalDateTime.now())
-                        .build();
-
-        return ResponseEntity.ok(response);
+                        .build()
+        );
     }
 
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<ApiResponse<String>> deleteCategory(
             @PathVariable Long categoryId) {
 
-        boolean deleted = categoryService.deleteCategory(categoryId);
+        categoryService.deleteCategory(categoryId);
 
-        ApiResponse<String> response =
+        return ResponseEntity.ok(
                 ApiResponse.<String>builder()
-                        .success(deleted)
-                        .message(deleted ?
-                                "Category deleted successfully"
-                                : "Category not found")
-                        .data(deleted ?
-                                "Category deleted successfully"
-                                : "No Category Found")
+                        .success(true)
+                        .message("Category deleted successfully.")
+                        .data(null)
                         .timestamp(LocalDateTime.now())
-                        .build();
-
-        return ResponseEntity.ok(response);
+                        .build()
+        );
     }
-
 }

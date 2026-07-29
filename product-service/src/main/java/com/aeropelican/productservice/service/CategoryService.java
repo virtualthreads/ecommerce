@@ -2,7 +2,12 @@ package com.aeropelican.productservice.service;
 
 import com.aeropelican.productservice.dto.request.CreateCategoryRequest;
 import com.aeropelican.productservice.dto.request.UpdateCategoryRequest;
+import com.aeropelican.productservice.dto.response.CategoryResponse;
 import com.aeropelican.productservice.entity.Category;
+import com.aeropelican.productservice.exception.BadRequestException;
+import com.aeropelican.productservice.exception.DuplicateResourceException;
+import com.aeropelican.productservice.exception.ResourceNotFoundException;
+import com.aeropelican.productservice.mapper.CategoryMapper;
 import com.aeropelican.productservice.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,55 +21,111 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    // Get All Categories
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    // ============================
+    // GET ALL CATEGORIES
+    // ============================
+
+    public List<CategoryResponse> getAllCategories() {
+
+        return categoryRepository.findAll()
+                .stream()
+                .map(CategoryMapper::toResponse)
+                .toList();
     }
 
-    // Get Category By Id
-    public Category getCategory(Long categoryId) {
-        return categoryRepository.findById(categoryId).orElse(null);
+    // ============================
+    // GET CATEGORY BY ID
+    // ============================
+
+    public CategoryResponse getCategory(Long categoryId) {
+
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Category not found with id : " + categoryId));
+
+        return CategoryMapper.toResponse(category);
     }
 
-    // Create Category
-    public Category createCategory(CreateCategoryRequest request) {
+    // ============================
+    // CREATE CATEGORY
+    // ============================
+
+    public CategoryResponse createCategory(CreateCategoryRequest request) {
+
+        if (request.getCategoryName() == null ||
+                request.getCategoryName().trim().isEmpty()) {
+
+            throw new BadRequestException("Category name is required.");
+        }
+
+        boolean exists = categoryRepository.findAll()
+                .stream()
+                .anyMatch(c ->
+                        c.getCategoryName().equalsIgnoreCase(
+                                request.getCategoryName().trim()));
+
+        if (exists) {
+            throw new DuplicateResourceException(
+                    "Category already exists.");
+        }
 
         Category category = new Category();
 
-        category.setCategoryName(request.getCategoryName());
+        category.setCategoryName(request.getCategoryName().trim());
         category.setDescription(request.getDescription());
-        category.setIsActive(request.getIsActive());
+        category.setIsActive(
+                request.getIsActive() == null
+                        ? true
+                        : request.getIsActive());
+
         category.setCreatedAt(LocalDateTime.now());
 
-        return categoryRepository.save(category);
+        category = categoryRepository.save(category);
+
+        return CategoryMapper.toResponse(category);
     }
 
-    // Update Category
-    public Category updateCategory(Long categoryId,
-                                   UpdateCategoryRequest request) {
+    // ============================
+    // UPDATE CATEGORY
+    // ============================
 
-        Category category =
-                categoryRepository.findById(categoryId).orElse(null);
+    public CategoryResponse updateCategory(
+            Long categoryId,
+            UpdateCategoryRequest request) {
 
-        if (category == null) {
-            return null;
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Category not found with id : " + categoryId));
+
+        if (request.getCategoryName() == null ||
+                request.getCategoryName().trim().isEmpty()) {
+
+            throw new BadRequestException("Category name is required.");
         }
 
-        category.setCategoryName(request.getCategoryName());
+        category.setCategoryName(request.getCategoryName().trim());
         category.setDescription(request.getDescription());
         category.setIsActive(request.getIsActive());
 
-        return categoryRepository.save(category);
+        category = categoryRepository.save(category);
+
+        return CategoryMapper.toResponse(category);
     }
 
-    // Delete Category
+    // ============================
+    // DELETE CATEGORY
+    // ============================
+
     public boolean deleteCategory(Long categoryId) {
 
-        if (!categoryRepository.existsById(categoryId)) {
-            return false;
-        }
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Category not found with id : " + categoryId));
 
-        categoryRepository.deleteById(categoryId);
+        categoryRepository.delete(category);
 
         return true;
     }
