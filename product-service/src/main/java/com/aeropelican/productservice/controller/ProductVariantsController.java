@@ -3,6 +3,8 @@ package com.aeropelican.productservice.controller;
 import com.aeropelican.productservice.dto.request.CreateProduct_VariantsRequest;
 import com.aeropelican.productservice.dto.request.UpdateProduct_Variants;
 import com.aeropelican.productservice.dto.response.APIResponse;
+import com.aeropelican.productservice.dto.response.PageResponse;
+import com.aeropelican.productservice.dto.response.ProductResponse;
 import com.aeropelican.productservice.dto.response.Product_variantsResponse;
 import com.aeropelican.productservice.entity.Product_Variants;
 import com.aeropelican.productservice.service.ProductVariantsService;
@@ -20,34 +22,28 @@ import java.util.List;
 public class ProductVariantsController {
 
     private final ProductVariantsService productVariantsService;
-    @GetMapping
-    public ResponseEntity<APIResponse<List<Product_variantsResponse>>> getAllProductVariants() {
-        List<Product_variantsResponse> result = productVariantsService.listProductVariants();
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(APIResponse.<List<Product_variantsResponse>>builder()
+
+    @GetMapping("/{page}/{size}/{sortBy}/{sortDir}")
+    public ResponseEntity<APIResponse<PageResponse<Product_variantsResponse>>> getAllProduct_Variants(
+            @PathVariable int page,
+            @PathVariable int size,
+            @PathVariable String sortBy,
+            @PathVariable String sortDir) {
+
+        PageResponse<Product_variantsResponse> result =
+                productVariantsService.listProduct_Variants(page, size, sortBy, sortDir);
+
+        return ResponseEntity.ok(
+                APIResponse.<PageResponse<Product_variantsResponse>>builder()
                         .data(result)
-                        .message("Product variants fetched successfully")
+                        .message("Product_Variants fetched successfully")
                         .success(true)
                         .timestamp(LocalDateTime.now())
-                        .build());
-    }
-    @GetMapping("/{variant_id}")
-    public ResponseEntity<APIResponse<Product_Variants>> getProductVariant(
-            @PathVariable Integer variant_id) {
-
-        Product_Variants product_variants = productVariantsService.getProductVariant(variant_id);
-
-        APIResponse<Product_Variants> response = APIResponse.<Product_Variants>builder()
-                .data(product_variants)
-                .message("Product Variant fetched successfully")
-                .success(true)
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        return ResponseEntity.ok(response);
+                        .build()
+        );
     }
 
+    //To create Product_variant
     @PostMapping
     public ResponseEntity<APIResponse<Product_Variants>> createProductVariant(
             @RequestBody CreateProduct_VariantsRequest request) {

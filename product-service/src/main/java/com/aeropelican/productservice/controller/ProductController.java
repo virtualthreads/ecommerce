@@ -3,6 +3,7 @@ package com.aeropelican.productservice.controller;
 import com.aeropelican.productservice.dto.request.CreateProductRequest;
 import com.aeropelican.productservice.dto.request.UpdateProduct;
 import com.aeropelican.productservice.dto.response.APIResponse;
+import com.aeropelican.productservice.dto.response.PageResponse;
 import com.aeropelican.productservice.dto.response.ProductResponse;
 import com.aeropelican.productservice.entity.Product;
 import com.aeropelican.productservice.service.ProductService;
@@ -18,24 +19,26 @@ import java.util.List;
 @RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
 public class ProductController {
-
     private final ProductService productService;
-    /*@GetMapping
-    public List<Product> getAllProducts() {
-        List<Product> result = productService.listProducts();
-        return result;
-    }*/
-    @GetMapping
-    public ResponseEntity<APIResponse<List<ProductResponse>>> getAllProduct( ){
-        List<ProductResponse> result = productService.listProducts();
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(APIResponse.<List<ProductResponse>>builder()
+
+    @GetMapping("/{page}/{size}/{sortBy}/{sortDir}")
+    public ResponseEntity<APIResponse<PageResponse<ProductResponse>>> getAllProducts(
+            @PathVariable int page,
+            @PathVariable int size,
+            @PathVariable String sortBy,
+            @PathVariable String sortDir) {
+
+        PageResponse<ProductResponse> result =
+                productService.listProducts(page, size, sortBy, sortDir);
+
+        return ResponseEntity.ok(
+                APIResponse.<PageResponse<ProductResponse>>builder()
                         .data(result)
-                        .message("Product fetched successfully")
+                        .message("Products fetched successfully")
                         .success(true)
                         .timestamp(LocalDateTime.now())
-                        .build());
+                        .build()
+        );
     }
 
     @PostMapping

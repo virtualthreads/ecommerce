@@ -4,6 +4,7 @@ import com.aeropelican.productservice.dto.request.CreateCategoryRequest;
 import com.aeropelican.productservice.dto.request.UpdateCategory;
 import com.aeropelican.productservice.dto.response.APIResponse;
 import com.aeropelican.productservice.dto.response.CategoryResponse;
+import com.aeropelican.productservice.dto.response.PageResponse;
 import com.aeropelican.productservice.dto.response.ProductResponse;
 import com.aeropelican.productservice.entity.Category;
 import com.aeropelican.productservice.service.CategoryService;
@@ -20,17 +21,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public  class CategoryController {
     private final CategoryService categoryService;
-    @GetMapping
-    public ResponseEntity<APIResponse<List<CategoryResponse>>> getAllCategories() {
-        List<CategoryResponse> result = categoryService.listCategories();
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(APIResponse.<List<CategoryResponse>>builder()
+
+    @GetMapping("/{page}/{size}/{sortBy}/{sortDir}")
+    public ResponseEntity<APIResponse<PageResponse<CategoryResponse>>> getAllCategories(
+            @PathVariable int page,
+            @PathVariable int size,
+            @PathVariable String sortBy,
+            @PathVariable String sortDir) {
+
+        PageResponse<CategoryResponse> result =
+                categoryService.listCategories(page, size, sortBy, sortDir);
+
+        return ResponseEntity.ok(
+                APIResponse.<PageResponse<CategoryResponse>>builder()
                         .data(result)
-                        .message("Categories fetched successfully")
+                        .message("Products fetched successfully")
                         .success(true)
                         .timestamp(LocalDateTime.now())
-                        .build());
+                        .build()
+        );
     }
     @GetMapping("/{category_id}")
     public  ResponseEntity<APIResponse<Category>> getCategory(@PathVariable Integer category_id){

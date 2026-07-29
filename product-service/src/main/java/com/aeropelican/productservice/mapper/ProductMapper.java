@@ -4,7 +4,7 @@ import com.aeropelican.productservice.dto.response.ProductResponse;
 import com.aeropelican.productservice.entity.Product;
 
 public class ProductMapper {
-   /* public static ProductResponse toResponse(Product product) {
+    public static ProductResponse toResponse(Product product) {
 
             return ProductResponse.builder()
                     .productId(product.getProductId())
@@ -16,6 +16,6 @@ public class ProductMapper {
                     .created_at(product.getCreated_at())
                     .updated_at(product.getUpdated_at())
                     .build();
-        }*/
+        }
 
 }
