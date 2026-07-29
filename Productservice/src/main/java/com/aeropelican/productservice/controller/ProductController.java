@@ -1,43 +1,59 @@
 package com.aeropelican.productservice.controller;
 
-import com.aeropelican.productservice.dto.CreateProductRequest;
 import com.aeropelican.productservice.dto.response.ApiResponse;
-import com.aeropelican.productservice.entity.Product;
-import com.aeropelican.productservice.repository.ProductRepository;
+import com.aeropelican.productservice.dto.response.ProductResponse;
 import com.aeropelican.productservice.service.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
 public class ProductController {
 
     private final ProductService productService;
 
+    // GET ALL PRODUCTS WITH PAGINATION
     @GetMapping
-    public List<Product> getAllProducts() {
-        List<Product> result = productService.listProducts();
-        return result;
+    public ResponseEntity<ApiResponse<Page<ProductResponse>>> getAllProducts(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+
+        PageRequest pageable = PageRequest.of(page, size);
+
+        Page<ProductResponse> products =
+                productService.listProducts(pageable);
+
+        ApiResponse<Page<ProductResponse>> apiResponse =
+                ApiResponse.<Page<ProductResponse>>builder()
+                        .data(products)
+                        .message("Products fetched successfully")
+                        .success(true)
+                        .timestamp(LocalDateTime.now())
+                        .build();
+
+        return ResponseEntity.ok(apiResponse);
     }
 
+    // GET PRODUCT BY ID
     @GetMapping("/{productId}")
-    public ResponseEntity<ApiResponse<Product>> getProduct(@PathVariable(name = "productId") Integer pid) {
-        Product product = productService.getProduct(pid);
+    public ResponseEntity<ApiResponse<ProductResponse>> getProduct(
+            @PathVariable("productId") Integer productId) {
 
-        ApiResponse apiResponse = ApiResponse.builder()
-                .data(product)
-                .message("Product details fetched successfully")
-                .success(product == null ? false : true)
-                .timestamp(LocalDateTime.now())
-                .build();
+        ProductResponse product = productService.getProduct(productId);
+
+        ApiResponse<ProductResponse> apiResponse =
+                ApiResponse.<ProductResponse>builder()
+                        .data(product)
+                        .message("Product details fetched successfully")
+                        .success(true)
+                        .timestamp(LocalDateTime.now())
+                        .build();
 
         return ResponseEntity.ok(apiResponse);
     }
