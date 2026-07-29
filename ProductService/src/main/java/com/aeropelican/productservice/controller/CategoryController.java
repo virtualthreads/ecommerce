@@ -1,7 +1,7 @@
 package com.aeropelican.productservice.controller;
 
 import com.aeropelican.productservice.dto.response.ApiResponse;
-import com.aeropelican.productservice.entity.Category;
+import com.aeropelican.productservice.dto.response.CategoryResponse;
 import com.aeropelican.productservice.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,18 +16,23 @@ import java.time.LocalDateTime;
 @RequestMapping("/api/v1/category")
 @RequiredArgsConstructor
 public class CategoryController {
+
     private final CategoryService categoryService;
 
+    // GET CATEGORY BY ID
     @GetMapping("/{catId}")
-    public ResponseEntity<ApiResponse<Category>> getCategory(@PathVariable Long catId) {
-        Category category = categoryService.getCategory(catId);
+    public ResponseEntity<ApiResponse<CategoryResponse>> getCategory(
+            @PathVariable("catId") Long catId) {
 
-        ApiResponse apiResponse = ApiResponse.builder()
-                .data(category)
-                .message("Category details fetched successfully")
-                .success(category == null ? false : true)
-                .timestamp(LocalDateTime.now())
-                .build();
+        CategoryResponse category = categoryService.getCategory(catId);
+
+        ApiResponse<CategoryResponse> apiResponse =
+                ApiResponse.<CategoryResponse>builder()
+                        .data(category)
+                        .message("Category details fetched successfully")
+                        .success(true)
+                        .timestamp(LocalDateTime.now())
+                        .build();
 
         return ResponseEntity.ok(apiResponse);
     }

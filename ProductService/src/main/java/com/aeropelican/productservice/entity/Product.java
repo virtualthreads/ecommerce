@@ -3,20 +3,33 @@ package com.aeropelican.productservice.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-@Table(name = "products")
+import java.time.LocalDateTime;
+
 @Entity
+@Table(name = "products")
 @Data
 public class Product {
+
     @Id
-    @Column(name = "product_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "product_id")
     private Integer productId;
+
     @Column(name = "product_name")
     private String productName;
-    @Column(name = "category")
-    private String category;
-    @Column(name = "price")
-    private Double price;
-    @Column(name = "quantity")
-    private Integer quantity;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "brand")
+    private String brand;
+
+    @Column(name = "is_active")
+    private Boolean isActive = true;
+
+    @Column(name = "created_at")
+    private LocalDateTime createAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }
