@@ -2,14 +2,14 @@ package com.aeropelican.productservice.controller;
 
 import com.aeropelican.productservice.dto.request.CreateProductVariantsRequest;
 import com.aeropelican.productservice.dto.request.UpdateProductVariantsRequest;
-import com.aeropelican.productservice.entity.ProductVariants;
+import com.aeropelican.productservice.dto.response.ApiResponse;
+import com.aeropelican.productservice.dto.response.PageResponse;
+import com.aeropelican.productservice.dto.response.ProductVariantsResponse;
 import com.aeropelican.productservice.service.ProductVariantsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/variants")
@@ -19,30 +19,49 @@ public class ProductVariantsController {
     private ProductVariantsService productVariantsService;
 
     @PostMapping
-    public ResponseEntity<ProductVariants> saveVariant(@RequestBody CreateProductVariantsRequest request) {
-        ProductVariants variant = productVariantsService.saveVariant(request);
-        return new ResponseEntity<>(variant, HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse<ProductVariantsResponse>> createVariant(@RequestBody CreateProductVariantsRequest request) {
+        return new ResponseEntity<>(productVariantsService.saveVariant(request), HttpStatus.CREATED);
     }
 
-    @GetMapping
-    public ResponseEntity<List<ProductVariants>> getAllVariants() {
-        return ResponseEntity.ok(productVariantsService.getAllVariants());
+    // URL: GET /api/v1/variants/0/10
+    @GetMapping("/{page}/{size}")
+    public ResponseEntity<ApiResponse<PageResponse<ProductVariantsResponse>>> getAllVariants(
+            @PathVariable int page,
+            @PathVariable int size) {
+        return ResponseEntity.ok(productVariantsService.getAllVariants(page, size, "variantId", "ASC"));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProductVariants> getVariantById(@PathVariable Long id) {
+    // URL: GET /api/v1/variants/0/10/variantName
+    @GetMapping("/{page}/{size}/{sortBy}")
+    public ResponseEntity<ApiResponse<PageResponse<ProductVariantsResponse>>> getAllVariantsWithSort(
+            @PathVariable int page,
+            @PathVariable int size,
+            @PathVariable String sortBy) {
+        return ResponseEntity.ok(productVariantsService.getAllVariants(page, size, sortBy, "ASC"));
+    }
+
+    // URL: GET /api/v1/variants/0/10/variantName/desc
+    @GetMapping("/{page}/{size}/{sortBy}/{sortDirection}")
+    public ResponseEntity<ApiResponse<PageResponse<ProductVariantsResponse>>> getAllVariantsWithSortDir(
+            @PathVariable int page,
+            @PathVariable int size,
+            @PathVariable String sortBy,
+            @PathVariable String sortDirection) {
+        return ResponseEntity.ok(productVariantsService.getAllVariants(page, size, sortBy, sortDirection));
+    }
+
+    @GetMapping("/id/{id}")
+    public ResponseEntity<ApiResponse<ProductVariantsResponse>> getVariantById(@PathVariable Long id) {
         return ResponseEntity.ok(productVariantsService.getVariantById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductVariants> updateVariant(@PathVariable Long id, @RequestBody UpdateProductVariantsRequest request) {
-        ProductVariants updatedVariant = productVariantsService.updateVariant(id, request);
-        return ResponseEntity.ok(updatedVariant);
+    public ResponseEntity<ApiResponse<ProductVariantsResponse>> updateVariant(@PathVariable Long id, @RequestBody UpdateProductVariantsRequest request) {
+        return ResponseEntity.ok(productVariantsService.updateVariant(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteVariant(@PathVariable Long id) {
-        String response = productVariantsService.deleteVariant(id);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<String>> deleteVariant(@PathVariable Long id) {
+        return ResponseEntity.ok(productVariantsService.deleteVariant(id));
     }
 }
