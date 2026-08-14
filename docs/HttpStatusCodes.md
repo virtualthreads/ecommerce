@@ -23,3 +23,4 @@
 | Too Many Requests     | `429 Too Many Requests`     | Rate limit exceeded                                    |
 | Server Error          | `500 Internal Server Error` | Unexpected server error                                |
 | Service Down          | `503 Service Unavailable`   | Temporary outage or maintenance                        |
+
