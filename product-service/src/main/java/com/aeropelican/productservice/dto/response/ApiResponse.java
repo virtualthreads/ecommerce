@@ -18,8 +18,6 @@ public class ApiResponse<T> {
     private T data;
     private ApiError error;
     private LocalDateTime timestamp;
-
-
     public static <T> ApiResponse<T> success(T data, String message) {
         return ApiResponse.<T>builder()
                 .success(true)

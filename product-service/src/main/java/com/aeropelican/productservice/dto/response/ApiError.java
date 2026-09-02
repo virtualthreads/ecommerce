@@ -15,7 +15,6 @@ public class ApiError {
     private int status;
     private String path;
     private List<FieldError> fieldErrors;
-
     @Data
     @Builder
     public static class FieldError {
