@@ -1,4 +1,4 @@
-# ecommerce
+# Srikanth reddy ecommerce
 This is an enterprise e-commerce application built to demonstrate how real-world online shopping platforms are designed and developed using Java and modern software engineering practices.
 
 The application is divided into the following microservices. The goal is to build a production-style application step by step, starting from the basics.
